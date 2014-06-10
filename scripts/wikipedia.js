@@ -42,25 +42,40 @@ var getImage = function (el, wikiUrl) {
 			url: wikiUrl
 		}).done(function(html) {
 			
+			var findEverything = true;
+			
 			var seachIndex = html.indexOf('id="mw-content-text"');
-			//console.log('seachIndex: ' + seachIndex + ' [id="mw-content-text"]');
+			if (seachIndex === -1) findEverything = false;
+			console.log('seachIndex: ' + seachIndex + ' [id="mw-content-text"] - ' + findEverything);
+			
+			seachIndex = html.indexOf('infobox', seachIndex);
+			if (seachIndex === -1) findEverything = false;
+			console.log('seachIndex: ' + seachIndex + ' [infobox] - ' + findEverything);
+			
 			seachIndex = html.indexOf('class="image"', seachIndex);
-			//console.log('seachIndex: ' + seachIndex + ' [class="image"]');
+			if (seachIndex === -1) findEverything = false;
+			console.log('seachIndex: ' + seachIndex + ' [class="image"] - ' + findEverything);
+			
 			seachIndex = html.indexOf('<img ', seachIndex);
-			//console.log('seachIndex: ' + seachIndex + ' [<img ]');
+			if (seachIndex === -1) findEverything = false;
+			console.log('seachIndex: ' + seachIndex + ' [<img ] - ' + findEverything);
+			
 			seachIndex = html.indexOf('src="', seachIndex);
-			//console.log('seachIndex: ' + seachIndex + ' [src="]');
+			if (seachIndex === -1) findEverything = false;
+			console.log('seachIndex: ' + seachIndex + ' [src="] - ' + findEverything);
 			
-			// Offset for the length of 'src="'
-			seachIndex += 5;
-			// Get the end index of the src
-			var endSrc = html.indexOf('"', seachIndex);
-			
-			// Get the image source
-			imgSrc = html.substring(seachIndex, endSrc);
-			console.log('imgSrc(' + seachIndex + ', ' + endSrc + '): ' + imgSrc);
-			// And show it
-			showImage(el, imgSrc);
+			if (findEverything) {
+				// Offset for the length of 'src="'
+				seachIndex += 5;
+				// Get the end index of the src
+				var endSrc = html.indexOf('"', seachIndex);
+				
+				// Get the image source
+				imgSrc = html.substring(seachIndex, endSrc);
+				console.log('imgSrc(' + seachIndex + ', ' + endSrc + '): ' + imgSrc);
+				// And show it
+				showImage(el, imgSrc);
+			}
 		});
 	}
 };
