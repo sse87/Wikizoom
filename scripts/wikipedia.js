@@ -12,34 +12,16 @@ $(document).ready(function () {
 	console.log('document ready!');
 	
 	$('a').hover(function() {
-		//console.log('hover in!');
 		
 		var href = $(this).attr('href');
 		console.log('href: ' + href);
 		
-		// if href is not an image...
-		var imageSrc = '';
-		if (href.endsWith('.jpg') || href.endsWith('.png')) {
-			//imageSrc = href;
-			imageSrc = $(this).find('img').attr('src');
-		}
-		else {
-			
-			// TODO: use ajax to get page src and find the first image source, set it with value of imageSrc
-			// If not leave imageSrc var empty
-			//imageSrc = '';
-		}
-		
-		// Show image
 		var that = this;
 		t = setTimeout(function () {
-			getImage(that, imageSrc, href);
+			getImage(that, href);
 		}, 500);
 		
-		// temp image src
-		
 	}, function() {
-		//console.log('hover out!');
 		
 		clearTimeout(t);
 		$('.hoverImg').remove();
@@ -47,33 +29,39 @@ $(document).ready(function () {
 	});
 });
 
-var getImage = function (el, imgSrc, wikiUrl) {
-	if (imgSrc === '') {
+var getImage = function (el, wikiUrl) {
+	// if wikiUrl is not an image...
+	var imgSrc = '';
+	if (wikiUrl.endsWith('.jpg') || wikiUrl.endsWith('.png')) {
+		imgSrc = $(el).find('img').attr('src');
+		showImage(el, imgSrc);
+	}
+	else {
 		$.ajax({
 			type: "GET",
 			url: wikiUrl
 		}).done(function(html) {
 			
 			var seachIndex = html.indexOf('id="mw-content-text"');
-			console.log('seachIndex: ' + seachIndex + ' [id="mw-content-text"]');
+			//console.log('seachIndex: ' + seachIndex + ' [id="mw-content-text"]');
 			seachIndex = html.indexOf('class="image"', seachIndex);
-			console.log('seachIndex: ' + seachIndex + ' [class="image"]');
+			//console.log('seachIndex: ' + seachIndex + ' [class="image"]');
 			seachIndex = html.indexOf('<img ', seachIndex);
-			console.log('seachIndex: ' + seachIndex + ' [<img ]');
+			//console.log('seachIndex: ' + seachIndex + ' [<img ]');
 			seachIndex = html.indexOf('src="', seachIndex);
-			console.log('seachIndex: ' + seachIndex + ' [src="]');
+			//console.log('seachIndex: ' + seachIndex + ' [src="]');
 			
+			// Offset for the length of 'src="'
 			seachIndex += 5;
-			
+			// Get the end index of the src
 			var endSrc = html.indexOf('"', seachIndex);
 			
+			// Get the image source
 			imgSrc = html.substring(seachIndex, endSrc);
 			console.log('imgSrc(' + seachIndex + ', ' + endSrc + '): ' + imgSrc);
+			// And show it
 			showImage(el, imgSrc);
 		});
-	}
-	else {
-		showImage(el, imgSrc);
 	}
 };
 
