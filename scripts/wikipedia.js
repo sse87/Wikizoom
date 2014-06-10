@@ -7,6 +7,7 @@ String.prototype.endsWith = function (pattern) {
 };
 
 var imageSrc = '';
+var t;
 
 $(document).ready(function () {
 	console.log('document ready!');
@@ -19,24 +20,30 @@ $(document).ready(function () {
 		
 		// if href is not an image...
 		if (href.endsWith('.jpg') || href.endsWith('.png')) {
-			imageSrc = href;
+			//imageSrc = href;
+			imageSrc = $(this).find('img').attr('src');
 		}
 		else {
 			
 			// TODO: use ajax to get page src and find the first image source, set it with value of imageSrc
 			// If not leave imageSrc var empty
+			//imageSrc = '';
+			// Mock the source
+			imageSrc = 'http://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Bryan_Singer_by_Gage_Skidmore.jpg/220px-Bryan_Singer_by_Gage_Skidmore.jpg';
 		}
 		
-		// TODO: delay for 500 ms if hover out is not activated
+		// Show image
+		var that = this;
+		t = setTimeout(function () {
+			showImage(that, imageSrc);
+		}, 500);
 		
 		// temp image src
-		var imageSrc = 'http://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Bryan_Singer_by_Gage_Skidmore.jpg/220px-Bryan_Singer_by_Gage_Skidmore.jpg';
-		
-		showImage(this, imageSrc);
 		
 	}, function() {
 		//console.log('hover out!');
 		
+		clearTimeout(t);
 		$('.hoverImg').remove();
 		
 	});
@@ -48,6 +55,6 @@ var showImage = function (el, imageSrc) {
 		hoverImg.css({
 			"position": "absolute"
 		});
-		$(el).append(hoverImg);
+		$(el).prepend(hoverImg);
 	}
 };
