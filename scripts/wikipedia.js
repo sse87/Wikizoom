@@ -13,6 +13,7 @@ $(document).ready(function () {
 	
 	$('a').hover(function() {
 		
+		// TODO: prevent loading href of it self
 		var href = $(this).attr('href');
 		console.log('href: ' + href);
 		
@@ -24,17 +25,18 @@ $(document).ready(function () {
 	}, function() {
 		
 		clearTimeout(t);
-		$('.hoverImg').remove();
+		removeHover();
 		
 	});
 });
 
 var getImage = function (el, wikiUrl) {
+	showHover(el);
 	// if wikiUrl is not an image...
 	var imgSrc = '';
 	if (wikiUrl.endsWith('.jpg') || wikiUrl.endsWith('.png')) {
-		imgSrc = $(el).find('img').attr('src');
-		showImage(el, imgSrc);
+		imgSrc = $(el).find('img:not(.wikizoom img)').attr('src');
+		updateImage(imgSrc);
 	}
 	else {
 		$.ajax({
@@ -46,23 +48,23 @@ var getImage = function (el, wikiUrl) {
 			
 			var seachIndex = html.indexOf('id="mw-content-text"');
 			if (seachIndex === -1) findEverything = false;
-			console.log('seachIndex: ' + seachIndex + ' [id="mw-content-text"] - ' + findEverything);
+			//console.log('seachIndex: ' + seachIndex + ' [id="mw-content-text"] - ' + findEverything);
 			
 			seachIndex = html.indexOf('infobox', seachIndex);
 			if (seachIndex === -1) findEverything = false;
-			console.log('seachIndex: ' + seachIndex + ' [infobox] - ' + findEverything);
+			//console.log('seachIndex: ' + seachIndex + ' [infobox] - ' + findEverything);
 			
 			seachIndex = html.indexOf('class="image"', seachIndex);
 			if (seachIndex === -1) findEverything = false;
-			console.log('seachIndex: ' + seachIndex + ' [class="image"] - ' + findEverything);
+			//console.log('seachIndex: ' + seachIndex + ' [class="image"] - ' + findEverything);
 			
 			seachIndex = html.indexOf('<img ', seachIndex);
 			if (seachIndex === -1) findEverything = false;
-			console.log('seachIndex: ' + seachIndex + ' [<img ] - ' + findEverything);
+			//console.log('seachIndex: ' + seachIndex + ' [<img ] - ' + findEverything);
 			
 			seachIndex = html.indexOf('src="', seachIndex);
 			if (seachIndex === -1) findEverything = false;
-			console.log('seachIndex: ' + seachIndex + ' [src="] - ' + findEverything);
+			//console.log('seachIndex: ' + seachIndex + ' [src="] - ' + findEverything);
 			
 			if (findEverything) {
 				// Offset for the length of 'src="'
@@ -72,20 +74,35 @@ var getImage = function (el, wikiUrl) {
 				
 				// Get the image source
 				imgSrc = html.substring(seachIndex, endSrc);
-				console.log('imgSrc(' + seachIndex + ', ' + endSrc + '): ' + imgSrc);
+				//console.log('imgSrc(' + seachIndex + ', ' + endSrc + '): ' + imgSrc);
 				// And show it
-				showImage(el, imgSrc);
+				updateImage(imgSrc);
+			}
+			else {
+				removeHover();
 			}
 		});
 	}
 };
 
-var showImage = function (el, imgSrc) {
+var showHover = function (el) {
+	
+	var wikizoom = $('<div class="wikizoom">');
+	wikizoom.css({
+		"background-color": "#FFFFFF",
+		"border": "1px solid #000000",
+		"padding": "5px",
+		"position": "absolute"
+	});
+	wikizoom.append('<img src="' + chrome.extension.getURL('images/loading.gif') + '" alt="" /></div>');
+	$(el).prepend(wikizoom);
+};
+var updateImage = function (imgSrc) {
+	console.log('updateImage(' + imgSrc + '): ' + $('.wikizoom').length);
 	if (imgSrc !== '') {
-		var hoverImg = $('<img class="hoverImg" src="' + imgSrc + '" alt="" />')
-		hoverImg.css({
-			"position": "absolute"
-		});
-		$(el).prepend(hoverImg);
+		$('.wikizoom').html('<img src="' + imgSrc + '" alt="" />');
 	}
+};
+var removeHover = function () {
+	$('.wikizoom').remove();
 };
