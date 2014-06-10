@@ -6,7 +6,6 @@ String.prototype.endsWith = function (pattern) {
 	return d >= 0 && this.lastIndexOf(pattern) === d;
 };
 
-var imageSrc = '';
 var t;
 
 $(document).ready(function () {
@@ -19,6 +18,7 @@ $(document).ready(function () {
 		console.log('href: ' + href);
 		
 		// if href is not an image...
+		var imageSrc = '';
 		if (href.endsWith('.jpg') || href.endsWith('.png')) {
 			//imageSrc = href;
 			imageSrc = $(this).find('img').attr('src');
@@ -28,14 +28,12 @@ $(document).ready(function () {
 			// TODO: use ajax to get page src and find the first image source, set it with value of imageSrc
 			// If not leave imageSrc var empty
 			//imageSrc = '';
-			// Mock the source
-			imageSrc = 'http://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Bryan_Singer_by_Gage_Skidmore.jpg/220px-Bryan_Singer_by_Gage_Skidmore.jpg';
 		}
 		
 		// Show image
 		var that = this;
 		t = setTimeout(function () {
-			showImage(that, imageSrc);
+			getImage(that, imageSrc, href);
 		}, 500);
 		
 		// temp image src
@@ -49,9 +47,39 @@ $(document).ready(function () {
 	});
 });
 
-var showImage = function (el, imageSrc) {
-	if (imageSrc !== '') {
-		var hoverImg = $('<img class="hoverImg" src="' + imageSrc + '" alt="" />')
+var getImage = function (el, imgSrc, wikiUrl) {
+	if (imgSrc === '') {
+		$.ajax({
+			type: "GET",
+			url: wikiUrl
+		}).done(function(html) {
+			
+			var seachIndex = html.indexOf('id="mw-content-text"');
+			console.log('seachIndex: ' + seachIndex + ' [id="mw-content-text"]');
+			seachIndex = html.indexOf('class="image"', seachIndex);
+			console.log('seachIndex: ' + seachIndex + ' [class="image"]');
+			seachIndex = html.indexOf('<img ', seachIndex);
+			console.log('seachIndex: ' + seachIndex + ' [<img ]');
+			seachIndex = html.indexOf('src="', seachIndex);
+			console.log('seachIndex: ' + seachIndex + ' [src="]');
+			
+			seachIndex += 5;
+			
+			var endSrc = html.indexOf('"', seachIndex);
+			
+			imgSrc = html.substring(seachIndex, endSrc);
+			console.log('imgSrc(' + seachIndex + ', ' + endSrc + '): ' + imgSrc);
+			showImage(el, imgSrc);
+		});
+	}
+	else {
+		showImage(el, imgSrc);
+	}
+};
+
+var showImage = function (el, imgSrc) {
+	if (imgSrc !== '') {
+		var hoverImg = $('<img class="hoverImg" src="' + imgSrc + '" alt="" />')
 		hoverImg.css({
 			"position": "absolute"
 		});
