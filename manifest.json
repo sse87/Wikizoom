@@ -1,0 +1,38 @@
+{
+	"manifest_version": 2,
+
+	"name": "Wiki Zoom",
+	"description": "__MSG_extDescription__",
+	"version": "0.1.0",
+	"icons": {
+		"16": "images/icon16.png",
+		"32": "images/icon32.png",
+		"48": "images/icon48.png",
+		"128": "images/icon128.png"
+	},
+	"default_locale": "en",
+	"minimum_chrome_version": "18",
+	"background": {
+		"scripts": ["scripts/libs/jquery-2.1.0.min.js", "scripts/background.js"]
+	},
+	"page_action": {
+		"default_icon": "images/icon19.png",
+		"default_popup": "html/popup.html",
+		"default_title": "Wiki Zoom"
+	},
+	"web_accessible_resources": [
+		"images/loading.gif",
+		"scripts/libs/jquery-2.1.0.min.js"
+	],
+	"content_scripts": [
+		{
+			"js": ["scripts/libs/jquery-2.1.0.min.js"],
+			"matches": ["<all_urls>"],
+			"all_frames": true
+		},{
+			"js": ["scripts/wikipedia.js"],
+			"matches": ["*://*.wikipedia.org/*"],
+			"all_frames": true
+		}
+   ]
+}
