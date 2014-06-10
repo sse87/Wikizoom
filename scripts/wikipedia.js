@@ -1,11 +1,9 @@
 
 console.log('wikipedia.js here!');
 
-var endsWith = function (str, arrEnds) {
-	
-	// TODO: check the end of the str variable if any of the ends matches
-	
-	return false;
+String.prototype.endsWith = function (pattern) {
+	var d = this.length - pattern.length;
+	return d >= 0 && this.lastIndexOf(pattern) === d;
 };
 
 var imageSrc = '';
@@ -20,7 +18,7 @@ $(document).ready(function () {
 		console.log('href: ' + href);
 		
 		// if href is not an image...
-		if (endsWith(href, ['.jpg','.png'])) {
+		if (href.endsWith('.jpg') || href.endsWith('.png')) {
 			imageSrc = href;
 		}
 		else {
